@@ -1,8 +1,9 @@
 import User from "../models/user.model.js";
 import Message from "../models/message.model.js";
 import cloudinary from "../lib/cloudinary.js";
+import { getReceiverSocketId, io } from "../lib/socket.js";
 
-export const getUsersForSidebar = async (req, rea) => {
+export const getUsersForSidebar = async (req, res) => {
   try {
     const loggedInUserId = req.user._id; //since this is a protected route, the req will have userId in it
     const filteredUsers = await User.find({
@@ -53,7 +54,12 @@ export const sendMessage = async (req, res) => {
     });
     //saving newMessage to the database
     await newMessage.save();
-    //todo: real-time functionality will go here=> socketio
+    //real-time functionality goes here=> socketio
+    const receiverSocketId = getReceiverSocketId(receiverId);
+    if (receiverSocketId) {
+      // io.to(socketID).emit("eventName", data)
+      io.to(receiverSocketId).emit("newMessage", newMessage); //this is only taking care of where the message is to be sent
+    }
 
     res.status(201).json(newMessage); //201 means resource has been created
   } catch (error) {

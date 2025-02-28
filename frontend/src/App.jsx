@@ -12,8 +12,10 @@ import { Loader } from "lucide-react";
 import { Navigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
 const App = () => {
-  const { authUser, checkAuth, isCheckingAuth } = useAuthStore(); //destructured the zustand store
+  const { authUser, checkAuth, isCheckingAuth, onlineUsers } = useAuthStore(); //destructured the zustand store
   const { theme } = useThemeStore();
+
+  console.log("onlineUsers:", onlineUsers);
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);

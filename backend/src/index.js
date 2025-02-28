@@ -4,10 +4,11 @@ import cookieParser from "cookie-parser"; //to parse token from the cookies(in m
 import cors from "cors";
 import authRoutes from "./routes/auth.route.js"; //we put ".js" for the local files not the modules
 import messageRoutes from "./routes/message.route.js"; //we put ".js" for the local files not the modules
+import { app, server } from "./lib/socket.js";
 import { connectDB } from "./lib/db.js";
 dotenv.config();
 
-const app = express();
+// const app = express();
 const PORT = process.env.PORT;
 
 app.use(express.json()); //helps extract json data from the request from frontend
@@ -20,9 +21,9 @@ app.use(
   })
 );
 app.use("/api/auth", authRoutes);
-app.use("/api/message", messageRoutes);
+app.use("/api/messages", messageRoutes);
 //middleware
-app.listen(PORT, () => {
+server.listen(PORT, () => {
   console.log(" server is running on PORT " + PORT);
   connectDB();
 });
