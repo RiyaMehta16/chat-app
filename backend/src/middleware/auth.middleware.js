@@ -1,3 +1,4 @@
+//src/middleware/auth.middleware.js
 //can call it "protectRoute.js" as well, just a naming convention
 import jwt from "jsonwebtoken";
 import User from "../models/user.model.js";

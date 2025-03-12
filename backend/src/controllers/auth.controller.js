@@ -1,7 +1,52 @@
+//src/contollers/auth.controller.js
 import { generateToken } from "../lib/utils.js";
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
 import cloudinary from "../lib/cloudinary.js";
+
+export const googleAuth = async (req, res) => {
+  const { email, fullName, googleId, picture } = req.body;
+
+  try {
+    let user = await User.findOne({ email });
+
+    if (!user) {
+      // Create a new user if one does not exist.
+      // Since password is required, we generate a dummy password from googleId.
+      const dummyPassword = googleId; // googleId is typically long enough.
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(dummyPassword, salt);
+
+      user = new User({
+        fullName,
+        email,
+        password: hashedPassword,
+        profilePic: picture,
+        googleId,
+      });
+      await user.save();
+    } else if (!user.googleId) {
+      // Optionally update existing user to include their Google ID.
+      user.googleId = googleId;
+      await user.save();
+    }
+
+    // Generate a JWT token and set it in a cookie.
+    generateToken(user._id, res);
+
+    // Send back user data.
+    res.status(200).json({
+      _id: user._id,
+      fullName: user.fullName,
+      email: user.email,
+      profilePic: user.profilePic,
+    });
+  } catch (error) {
+    console.log("Error in googleAuth controller:", error.message);
+    res.status(500).json({ message: "Internal Server Error" });
+  }
+};
+
 export const signup = async (req, res) => {
   const { fullName, email, password } = req.body;
   try {
@@ -14,6 +59,7 @@ export const signup = async (req, res) => {
         .status(400)
         .json({ message: "Password must be at least 6 characters" });
     }
+
     //checking if user exists
     const user = await User.findOne({ email });
     if (user) {
@@ -78,6 +124,7 @@ export const login = async (req, res) => {
     res.status(500).json({ message: "Internal Server Error" });
   }
 };
+
 export const logout = (req, res) => {
   try {
     //if we want to log someone out, we need to clear the cookies

@@ -12,12 +12,16 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import AuthImagePattern from "../components/AuthImagePattern";
+
+import GoogleLoginButton from "../components/GoogleLoginButton";
 const SignupPage = () => {
   const [showPassword, setShowPassword] = useState(false);
+  const [showRepeatPassword, setShowRepeatPassword] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
     password: "",
+    repeatPassword: "",
   });
   const { signup, isSigningUp } = useAuthStore(); //global variable store
   const validateForm = () => {
@@ -26,9 +30,14 @@ const SignupPage = () => {
     if (!/\S+@\S+\.\S+/.test(formData.email))
       return toast.error("Invalid email format");
     if (!formData.password) return toast.error("Password is required");
+    if (!formData.repeatPassword)
+      return toast.error("Repeat Password is required");
     if (formData.password.length < 6)
       return toast.error("Password must be at least 6 characters");
-
+    if (formData.password !== formData.repeatPassword)
+      return toast.error(
+        "Passwords aren't matching. Please re-type the passwords!"
+      );
     return true;
   };
   const handleSubmit = (e) => {
@@ -36,6 +45,7 @@ const SignupPage = () => {
     const success = validateForm();
     if (success === true) signup(formData);
   };
+
   return (
     // left side
     <div className="min-h-screen grid lg:grid-cols-2">
@@ -53,6 +63,7 @@ const SignupPage = () => {
               </p>
             </div>
           </div>
+
           {/* form */}
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="form-control">
@@ -123,6 +134,37 @@ const SignupPage = () => {
                 </button>
               </div>
             </div>
+            {/* REPEAT PASSWORD */}
+            <div className="form-control">
+              <label className="label">
+                <span className="label-text font-medium">Repeat Password</span>
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <Lock className="size-5 text-base-content/40" />
+                </div>
+                <input
+                  type={showRepeatPassword ? "text" : "password"}
+                  className={`input input-bordered w-full pl-10`}
+                  placeholder="******"
+                  value={formData.repeatPassword}
+                  onChange={(e) =>
+                    setFormData({ ...formData, repeatPassword: e.target.value })
+                  }
+                />
+                <button
+                  type="button"
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                  onClick={() => setShowRepeatPassword(!showRepeatPassword)}
+                >
+                  {showRepeatPassword ? (
+                    <EyeOff className="size-5 text-base-content/40" />
+                  ) : (
+                    <Eye className="size-5 text-base-content/40" />
+                  )}
+                </button>
+              </div>
+            </div>
 
             <button
               type="submit"
@@ -138,6 +180,8 @@ const SignupPage = () => {
                 "Create Account"
               )}
             </button>
+            {/* GOOGLE SIGN IN */}
+            <GoogleLoginButton />
           </form>
 
           <div className="text-center">

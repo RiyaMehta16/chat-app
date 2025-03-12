@@ -19,6 +19,11 @@ const userSchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    googleId: {
+      type: String,
+      unique: true,
+      sparse: true, // sparse allows multiple docs without this field
+    },
   },
   { timestamps: true }
 );

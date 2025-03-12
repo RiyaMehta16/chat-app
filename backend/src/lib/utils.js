@@ -1,3 +1,4 @@
+//src/lib/utils.js
 //to generate a jwt token we need a JWT_SECRET in .env file
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";

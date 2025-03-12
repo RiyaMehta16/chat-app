@@ -6,4 +6,7 @@ import { nodePolyfills } from "vite-plugin-node-polyfills"; //external browser i
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react(), tailwindcss(), nodePolyfills()],
+  optimizeDeps: {
+    exclude: ["js-big-decimal"],
+  },
 });
